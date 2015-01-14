@@ -1,0 +1,55 @@
+{% extends 'index.html' %}
+
+{% block title %}微信公众号测试服务{% endblock title %}
+
+{% block main %}
+<div class="row">
+    <div class="col-lg-9">
+            <h1>User</h1>
+            <h2>关注者列表</h2>
+
+        <hr/>
+        <div class="row">
+
+            <div class="col-lg-7">
+                <h4>当前已关注用列表（<a href="/">刷新页面</a>）</h4>
+                {% if  users %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+
+                        <th>呢称</th>
+                        <th>微信号</th>
+                        <th>分组</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users%}
+                    <tr>
+                        <td>{{user['nickname']}}</td>
+                        <td>{{user['openid']}}</td>
+                        <td>{{user['groupid']}}</td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                  <em>暂无关注者</em>
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+        <br/>
+        <br/>
+
+    </div>
+
+
+</div>
+
+{% endblock main %}

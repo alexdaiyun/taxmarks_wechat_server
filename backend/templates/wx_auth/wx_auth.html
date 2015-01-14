@@ -1,0 +1,36 @@
+{% extends 'wx_auth/wx_index.html' %}
+
+{% block title %}税签服务{% endblock title %}
+
+{% block main %}
+<div class="main">
+
+    <div class="header">
+        <span class="logo"></span>
+
+        <p>输入手机号码以绑定你的微信</p>
+    </div>
+    <form action="" method="post" name="bindweixin">
+        <div class="content">
+
+            <div class="form-group">
+                <input type="text" class="form-control" id="inputPhone" placeholder="手机号码">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="inputCode" placeholder="验证码">
+            </div>
+
+
+        </div>
+        <div class="footer">
+            <input type="submit" value="绑定">
+            <a href="#" class="btn btn-primary btn-block">绑定</a>
+            <br/>
+            <pr>
+                如果你没有在税签注册过，请先注册税签
+            </pr>
+        </div>
+    </form>
+</div>
+
+{% endblock main %}

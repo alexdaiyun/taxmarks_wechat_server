@@ -1,0 +1,11 @@
+Flask
+Flask-RESTful
+Flask-Script
+Flask-SQLAlchemy
+Flask-OAuthlib
+Flask-WTF
+DBUtils
+SQLAlchemy
+requests
+six
+xmltodict==0.9.0

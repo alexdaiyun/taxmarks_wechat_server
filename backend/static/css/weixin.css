@@ -1,0 +1,43 @@
+* {
+  font-family: 'Avenir Next', 'Helvetica Neue', Avenir, Helvetica, 'Lantinghei SC', 'Hiragino Sans GB', sans-serif;
+}
+
+body {
+    background-color: #5db88b;
+}
+
+
+a {
+  color: #333333;
+}
+
+.main {
+    width: 86%;
+    margin: 0 7%;
+    height: 100%;
+}
+
+.header {
+    /*padding:14% 0 12%;*/
+    padding-top: 11px;
+    padding-bottom: 9px;
+
+    text-align: center;
+
+}
+.content {
+    height: 24%;
+}
+
+.footer {
+    height: 10%;
+    margin: 7% 0;
+}
+
+.header .logo {
+    height: 40px;
+    width: 150px;
+    display: inline-block;
+    background: url(../images/taxmarks_wx_logo_white.png) no-repeat 0 0;
+    margin-bottom: 6px;
+}

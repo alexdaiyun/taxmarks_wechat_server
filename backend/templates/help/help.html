@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+
+{% block title %}微信公众号测试服务{% endblock title %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-lg-9">
+
+            <h1>Help</h1>
+            <h2>API接口列表</h2>
+
+            <br>
+            <h4>发送文本消息</h4>
+            <ul>
+               <li>POST   &nbsp;&nbsp; <a href="#">/weixinClient/api/v1.0/sendTextMessage</a></li>
+            </ul>
+            <pre>
+                请求参数：
+
+                {
+                    "touser": "oNGinuMVf5HsHloMbYvPGlN3VzvM",
+                    "content": "2这只是一个测试哦",
+                    "url": "http://127.0.0.1/wecenter/?/m/question/12",
+                    "title": "通知消息"
+                }
+
+                提交的数据为JSON格式
+
+                touser: 接收方的openid
+                content: 发送的文本内容
+                url: 发送的链接，如果无，请设置为空
+                title: 消息标题，如果无，请设置为空
+
+                当只有content时，将发送文本消息
+                当有url时，将发送图文消息即包含链接
+            </pre>
+            <pre>
+                header设置：
+
+                Content-Type: application/json;charset=utf-8
+
+            </pre>
+            <pre>
+                返回结果
+                {
+                  'status': true,
+                  'result': ''
+                }
+
+            </pre>
+            <br/>
+            <!--
+            <ul>
+
+                <li>Get   &nbsp;&nbsp; <a href="/weixinClient/api/v1.0/tasks" target="_blank">/weixinClient/api/v1.0/tasks</a> </li>
+            </ul>
+            -->
+        </div>
+
+
+    </div>
+{% endblock main %}
