@@ -26,6 +26,27 @@ MP_CCONFIG = {
 BAE_ApiKey = 'ZwzUxUgBv7p27a55lf50K11F'
 BAE_SecretKey = 'XuNLVZW3DPdzVbiy69twLVmYgPPNO7Ga'
 
+
+测试环境
+
+
+APP_CONFIG = {
+    'MP_SERVER_HOST': u'http://helixappserver3.duapp.com',  # MP_SERVER的主机地址
+    'SSO_SERVER_HOST': u'http://218.244.132.167:8091',  # 提供SSO服务的地址
+    'TAXMARKS_WEIXINWEB_HOST': u'http://218.244.132.167:8090',  # taxmarks weixinweb的主机地址
+    'WE_CENTER_HOST': u'http://218.244.132.167:8080'  # WeCenter的主机地址
+}
+
+MP_CCONFIG = {
+    'MP_TOKEN_KEY': u'abcd1234',
+    'MP_AppID': u'wx3ef755a9cf4666ef',
+    'MP_AppSecret': u'4042e8bafb7c49f812b3e06b5708d841'
+}
+
+BAE_ApiKey = 'T691k52Yf8qgGDFBPaggCEhA'
+BAE_SecretKey = 'lSd8cyfEPCTBTp3MjIetgUg9YVem8UWO'
+
+
 """
 
 
@@ -100,13 +121,6 @@ class ProductionConfig(Config):
 
 
 class BAEConfig(Config):
-    """
-    taxmarksmp.duapp.com
-    BAE_ApiKey = 'ZwzUxUgBv7p27a55lf50K11F'
-    BAE_SecretKey = 'XuNLVZW3DPdzVbiy69twLVmYgPPNO7Ga'
-
-    """
-
     # BAE - Baidu Application Engine
     # API Key and Secret Key
     BAE_AK = os.getenv('BAE_AK') or 'ZwzUxUgBv7p27a55lf50K11F'
