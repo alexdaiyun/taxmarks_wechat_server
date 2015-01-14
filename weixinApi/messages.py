@@ -86,6 +86,7 @@ class ImageMessage(BaseMessage):
     详情请参阅 http://mp.weixin.qq.com/wiki/index.php?title=接收普通消息
     """
     type = 'image'
+    media_id = StringField('MediaId')
     image = StringField('PicUrl')
 
 
