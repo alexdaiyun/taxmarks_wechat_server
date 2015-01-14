@@ -87,6 +87,9 @@ def process_event(message):
         reply = process_click_event(message)
     elif message.event == 'view':
         reply = create_reply(u'view event, 收到你的消息了，谢谢', message)
+    else:
+        reply = None
+
     return reply
 
 
