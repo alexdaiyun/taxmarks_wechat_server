@@ -73,8 +73,9 @@ def page_help():
 @main.route('/user')
 def page_user():
     client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
-    # result = client.user.get_followers()
+    result = client.user.get_followers()
 
+    """
     SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
     urlfile = os.path.join(SITE_ROOT, "static", "users_data.json")
     current_app.logger.debug(urlfile)
@@ -104,6 +105,9 @@ def page_user():
 
     openid_list = json_object['openid']
 
+    """
+    openid_list = result['data']['openid']
+
     users = []
     i = 0
     for u_openid in openid_list:
@@ -117,12 +121,12 @@ def page_user():
                         openid=result_user['openid'],
                         groupid=result_group['groupid'])
 
-            """
+
             print(u'%s|%s|%s|%s' % (i,
                                     user['nickname'],
                                     user['openid'],
                                     user['groupid']))
-            """
+
             users.append(user)
             i += 1
         except Exception:
@@ -220,6 +224,23 @@ def wx_auth():
             access_token_res = weixin_oauth.fetch_access_token(code)
             openid = access_token_res['openid']
             access_token = access_token_res['access_token']
+
+            client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
+            result_user = client.user.get(openid)
+            wechat_user = []
+            wechat_user = dict(subscribe=result_user['subscribe'],
+                               nickname=result_user['nickname'],
+                               openid=result_user['openid'],
+                               headimgurl=result_user['headimgurl'],
+                               subscribe_time=result_user['subscribe_time']
+                               )
+
+            current_app.logger.info(u'subscribe:%s | subscribe_time:%s  | nickname:%s | openid:%s | headimgurl:%s'
+                                     % (wechat_user['subscribe'],
+                                        wechat_user['subscribe_time'],
+                                        wechat_user['nickname'],
+                                        wechat_user['openid'],
+                                        wechat_user['headimgurl']))
 
             # 默认跳转处理
             sso_redirect_url_list = [
@@ -342,32 +363,34 @@ def get_tasks():
     return jsonify({'tasks': tasks})
 
 
-def formatBizQueryParaMap(paraMap, urlencode):
-    """格式化参数，签名过程需要使用"""
-    slist = sorted(paraMap)
-    buff = []
-    for k in slist:
-        v = quote(paraMap[k]) if urlencode else paraMap[k]
-        buff.append("{0}={1}".format(k, v))
-
-    return "&".join(buff)
 
 
-def createOauthUrlForCode(redirectUrl):
-    """生成可以获得code的url"""
-    urlObj = {}
-    urlObj["appid"] = Config.MP_CONFIG['MP_AppID']
-    urlObj["redirect_uri"] = redirectUrl
-    urlObj["response_type"] = "code"
-    urlObj["scope"] = "snsapi_base"
-    urlObj["state"] = "STATE#wechat_redirect"
-    bizString = formatBizQueryParaMap(urlObj, False)
-    return "https://open.weixin.qq.com/connect/oauth2/authorize?" + bizString
-
-
-def example():
-    resp = u'this is example'
-    return resp
+# def formatBizQueryParaMap(paraMap, urlencode):
+#     """格式化参数，签名过程需要使用"""
+#     slist = sorted(paraMap)
+#     buff = []
+#     for k in slist:
+#         v = quote(paraMap[k]) if urlencode else paraMap[k]
+#         buff.append("{0}={1}".format(k, v))
+#
+#     return "&".join(buff)
+#
+#
+# def createOauthUrlForCode(redirectUrl):
+#     """生成可以获得code的url"""
+#     urlObj = {}
+#     urlObj["appid"] = Config.MP_CONFIG['MP_AppID']
+#     urlObj["redirect_uri"] = redirectUrl
+#     urlObj["response_type"] = "code"
+#     urlObj["scope"] = "snsapi_base"
+#     urlObj["state"] = "STATE#wechat_redirect"
+#     bizString = formatBizQueryParaMap(urlObj, False)
+#     return "https://open.weixin.qq.com/connect/oauth2/authorize?" + bizString
+#
+#
+# def example():
+#     resp = u'this is example'
+#     return resp
 
 
 """

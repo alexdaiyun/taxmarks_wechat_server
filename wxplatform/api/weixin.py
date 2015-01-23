@@ -70,9 +70,11 @@ def process_message_type(message):
     elif message.type == 'event':
         reply = process_event(message)
     elif message.type == 'voice':
-        reply = process_voice(message)
+        # reply = process_voice(message)
+        reply = None
     elif message.type == 'image':
-        reply = process_image(message)
+        # reply = process_image(message)
+        reply = None
     else:
         # reply = create_reply('Sorry, can not handle this for now，这是个测试版', message)
         # 默认转到多客服
@@ -86,7 +88,8 @@ def process_event(message):
     elif message.event == 'click':
         reply = process_click_event(message)
     elif message.event == 'view':
-        reply = create_reply(u'view event, 收到你的消息了，谢谢', message)
+        # reply = create_reply(u'view event, 收到你的消息了，谢谢', message)
+        reply = None
     else:
         reply = None
 
