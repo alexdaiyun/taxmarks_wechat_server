@@ -2,7 +2,9 @@
 __author__ = 'alexday'
 
 import os
-from urllib import quote
+import sys
+import datetime
+from urllib import quote, urlencode
 from flask import current_app, render_template, jsonify, request, abort, make_response, redirect, json, url_for
 
 from weixinApi.client import *
@@ -36,26 +38,57 @@ def home():
 
     users = []
 
-    pageIndex = 20
+    # pageIndex = 20
+    #
+    # i = 0
+    # for u_openid in openid_list:
+    #     if i > pageIndex:
+    #         pass
+    #     else:
+    #         try:
+    #             result_user = client.user.get(u_openid)
+    #             user = dict(nickname=result_user['nickname'], openid=result_user['openid'])
+    #             # print(u'nickname: %s openid: %s' % (user['nickname'], user['openid']))
+    #             users.append(user)
+    #             i += 1
+    #         except Exception:
+    #             pass
 
-    i = 0
-    for u_openid in openid_list:
-        if i > pageIndex:
-            pass
-        else:
-            try:
-                result_user = client.user.get(u_openid)
-                user = dict(nickname=result_user['nickname'], openid=result_user['openid'])
-                # print(u'nickname: %s openid: %s' % (user['nickname'], user['openid']))
-                users.append(user)
-                i += 1
-            except Exception:
-                pass
-
-    current_app.logger.debug(i)
     current_app.logger.debug('log debug: home page')
     # current_app.logger.info('log info: home page')
     # current_app.logger.exception('log exception: home page')
+
+    # print sys.getdefaultencoding()
+    #
+    # result_user = client.user.get(u'o9PwGj9yXeqPeVwe1ggfzNXwXX68')
+    # wechat_user = dict(subscribe=result_user['subscribe'],
+    #                    nickname=u'{0:s}'.format(result_user['nickname']),
+    #                    openid=result_user['openid'],
+    #                    headimgurl=u'{0:s}'.format(result_user['headimgurl']),
+    #                    subscribe_time=u'{0:s}'.format(
+    #                        datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
+    #                        .strftime('%Y-%m-%d %H:%M:%S')))
+    #
+    # current_app.logger.info(u'{0:s}'.format(wechat_user['nickname']))
+    # current_app.logger.info(u'{0:s}'.format(wechat_user['subscribe_time']))
+    #
+    # current_app.logger.info(
+    #     u'subscribe:{0:d} | subscribe_time:{1:s}  | openid:{2:s} | nickname:{3:s} | headimgurl:{4:s} '
+    #     .format(wechat_user['subscribe'],
+    #             wechat_user['subscribe_time'],
+    #             wechat_user['openid'],
+    #             wechat_user['nickname'],
+    #             wechat_user['headimgurl']))
+
+    # current_app.logger.info(
+    # u'subscribe:{0:s} | subscribe_time:{1:s}  | nickname:{2:s} | openid:{3:s} | headimgurl:{4:s}'
+    # .format(wechat_user['subscribe'],
+    #             wechat_user['subscribe_time'],
+    #             wechat_user['nickname'],
+    #             wechat_user['openid'],
+    #             wechat_user['headimgurl']))
+
+    # current_app.logger.info('日志输出abc佳🎀佳')
 
     return render_template('home/home.html', users=users)
 
@@ -121,7 +154,6 @@ def page_user():
                         openid=result_user['openid'],
                         groupid=result_group['groupid'])
 
-
             print(u'%s|%s|%s|%s' % (i,
                                     user['nickname'],
                                     user['openid'],
@@ -153,10 +185,10 @@ def wx_auth_redirect():
 
     # url = u'https://open.weixin.qq.com/connect/oauth2/authorize?' \
     # u'appid=wx3ef755a9cf4666ef' \
-    #       u'&redirect_uri=http%3A%2F%2Fhelixappserver3.duapp.com%2Fwx_auth' \
-    #       u'&response_type=code' \
-    #       u'&scope=snsapi_base' \
-    #       u'&state=STATE#wechat_redirect'
+    # u'&redirect_uri=http%3A%2F%2Fhelixappserver3.duapp.com%2Fwx_auth' \
+    # u'&response_type=code' \
+    # u'&scope=snsapi_base' \
+    # u'&state=STATE#wechat_redirect'
 
     args = request.args
     menucode = args.get('menucode', '')
@@ -227,20 +259,22 @@ def wx_auth():
 
             client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
             result_user = client.user.get(openid)
-            wechat_user = []
-            wechat_user = dict(subscribe=result_user['subscribe'],
-                               nickname=result_user['nickname'],
-                               openid=result_user['openid'],
-                               headimgurl=result_user['headimgurl'],
-                               subscribe_time=result_user['subscribe_time']
-                               )
 
-            current_app.logger.info(u'subscribe:%s | subscribe_time:%s  | nickname:%s | openid:%s | headimgurl:%s'
-                                     % (wechat_user['subscribe'],
-                                        wechat_user['subscribe_time'],
-                                        wechat_user['nickname'],
-                                        wechat_user['openid'],
-                                        wechat_user['headimgurl']))
+            wechat_user = dict(subscribe=result_user['subscribe'],
+                               nickname=u'{0:s}'.format(result_user['nickname']),
+                               openid=result_user['openid'],
+                               headimgurl=u'{0:s}'.format(result_user['headimgurl']),
+                               subscribe_time=u'{0:s}'.format(
+                                   datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
+                                   .strftime('%Y-%m-%d %H:%M:%S')))
+
+            current_app.logger.info(
+                u'subscribe:{0:d} | subscribe_time:{1:s}  | openid:{2:s} | nickname:{3:s} | headimgurl:{4:s} '
+                .format(wechat_user['subscribe'],
+                        wechat_user['subscribe_time'],
+                        wechat_user['openid'],
+                        wechat_user['nickname'],
+                        wechat_user['headimgurl']))
 
             # 默认跳转处理
             sso_redirect_url_list = [
@@ -363,17 +397,15 @@ def get_tasks():
     return jsonify({'tasks': tasks})
 
 
-
-
 # def formatBizQueryParaMap(paraMap, urlencode):
-#     """格式化参数，签名过程需要使用"""
-#     slist = sorted(paraMap)
-#     buff = []
-#     for k in slist:
-#         v = quote(paraMap[k]) if urlencode else paraMap[k]
-#         buff.append("{0}={1}".format(k, v))
+# """格式化参数，签名过程需要使用"""
+# slist = sorted(paraMap)
+# buff = []
+# for k in slist:
+# v = quote(paraMap[k]) if urlencode else paraMap[k]
+# buff.append("{0}={1}".format(k, v))
 #
-#     return "&".join(buff)
+# return "&".join(buff)
 #
 #
 # def createOauthUrlForCode(redirectUrl):

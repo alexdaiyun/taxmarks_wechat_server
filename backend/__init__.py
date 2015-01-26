@@ -2,6 +2,8 @@
 __author__ = 'alexday'
 
 import os
+import sys
+
 from flask import Flask
 
 from config import config
@@ -22,6 +24,10 @@ def get_appconfig():
 
 
 def create_app(config_name):
+
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
     app = Flask(__name__)
 
     app.config.from_object(config[config_name])
