@@ -202,6 +202,8 @@ def wx_auth_redirect():
 
     # redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
 
+    current_app.logger.debug(u'redirect_url: %s' % redirect_url)
+
     weixin_oauth = WeiXinOAuth(Config.MP_CONFIG['MP_AppID'],
                                Config.MP_CONFIG['MP_AppSecret'],
                                redirect_url,
@@ -228,7 +230,7 @@ def wx_auth():
 
     menucode = args.get('menucode', '')
     url = args.get('url', '')
-
+    current_app.logger.debug(u'[/wx_auth] menucode: %s  url: %s ' % (menucode, url))
     # 跳转页面默认值
     redirect_url = u''
     # 跳转页面根据menucode值进行设定
@@ -243,6 +245,8 @@ def wx_auth():
         redirect_url = url
 
     redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
+
+    current_app.logger.debug(u'redirect_url: %s' % redirect_url )
 
     weixin_oauth = WeiXinOAuth(Config.MP_CONFIG['MP_AppID'],
                                Config.MP_CONFIG['MP_AppSecret'],
@@ -306,6 +310,7 @@ def wx_auth():
                     u'&url=',
                     redirect_url
                 ]
+
             if menucode == '101':
                 # 税签微信版的SSO验证页面
                 sso_redirect_url_list = [
@@ -316,7 +321,8 @@ def wx_auth():
                     u'&url=',
                     redirect_url
                 ]
-                current_app.logger.debug(''.join(sso_redirect_url_list))
+
+            current_app.logger.debug(''.join(sso_redirect_url_list))
 
             return redirect(''.join(sso_redirect_url_list), code=302)
 
