@@ -9,6 +9,7 @@ from flask import current_app, render_template, jsonify, request, abort, make_re
 
 from weixinApi.client import *
 from weixinApi.oauth import *
+from weixinApi.exceptions import WeiXinClientException
 from config import Config
 from . import main
 
@@ -397,6 +398,27 @@ def delete_menu():
     result = client.menu.delete()
     return jsonify({'status': True, 'result': result})
 
+@main.route('/weixinClient/api/v1.0/Member', methods=['GET'])
+def query_member():
+    openid = request.args.get('openid', '')
+
+    if openid == u"":
+        return jsonify({})
+
+    try:
+        client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
+        result_user = client.user.get(openid)
+
+        wechat_user = dict(subscribe=result_user['subscribe'],
+                           nickname=u'{0:s}'.format(result_user['nickname']),
+                           openid=result_user['openid'],
+                           headimgurl=u'{0:s}'.format(result_user['headimgurl']),
+                           subscribe_time=u'{0:s}'.format(
+                               datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
+                               .strftime('%Y-%m-%d %H:%M:%S')))
+        return jsonify(wechat_user)
+    except WeiXinClientException, e:
+        return jsonify({u'errocde': e.errcode, u'errmsg': e.errmsg}), 400
 
 @main.route('/weixinClient/api/v1.0/tasks', methods=['GET'])
 def get_tasks():
