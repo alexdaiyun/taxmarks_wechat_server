@@ -5,6 +5,7 @@ import os
 import sys
 import datetime
 from urllib import quote, urlencode
+from functools import wraps
 from flask import current_app, render_template, jsonify, request, abort, make_response, redirect, json, url_for
 
 from weixinApi.client import *
@@ -29,6 +30,17 @@ tasks = [
     }
 ]
 
+def support_jsonp(f):
+    """Wraps JSONified output for JSONP"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        callback = request.args.get('callback', False)
+        if callback:
+            content = str(callback) + '(' + str(f(*args, **kwargs).data) + ')'
+            return current_app.response_class(content, mimetype='application/javascript')
+        else:
+            return f(*args, **kwargs)
+    return decorated_function
 
 @main.route('/')
 def home():
@@ -287,7 +299,8 @@ def wx_auth():
                 u'/SsoRedirect.aspx?',
                 u'openid=',
                 openid,
-                u'&url=',
+                u'&',
+                u'url=',
                 redirect_url
             ]
 
@@ -298,7 +311,8 @@ def wx_auth():
                     u'/#/wx_bind?',
                     u'openid=',
                     openid,
-                    u'&url=',
+                    u'&',
+                    u'url=',
                     redirect_url
                 ]
             if menucode == '100':
@@ -308,7 +322,8 @@ def wx_auth():
                     u'/#/wx/authorization?',
                     u'openid=',
                     openid,
-                    u'&url=',
+                    u'&',
+                    u'url=',
                     redirect_url
                 ]
 
@@ -319,7 +334,8 @@ def wx_auth():
                     u'/#/wx_bind?',
                     u'openid=',
                     openid,
-                    u'&url=',
+                    u'&',
+                    u'url=',
                     redirect_url
                 ]
 
@@ -398,7 +414,9 @@ def delete_menu():
     result = client.menu.delete()
     return jsonify({'status': True, 'result': result})
 
+
 @main.route('/weixinClient/api/v1.0/Member', methods=['GET'])
+@support_jsonp
 def query_member():
     openid = request.args.get('openid', '')
 
@@ -419,6 +437,30 @@ def query_member():
         return jsonify(wechat_user)
     except WeiXinClientException, e:
         return jsonify({u'errocde': e.errcode, u'errmsg': e.errmsg}), 400
+
+
+# 暂不使用
+def query_member_from_weixin(openid):
+    if openid == u"":
+        return jsonify({u'status': False,
+                        u'errocde': 1,
+                        u'errmsg': u'openid empty'})
+
+    try:
+        client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
+        result_user = client.user.get(openid)
+
+        wechat_user = dict(subscribe=result_user['subscribe'],
+                           nickname=u'{0:s}'.format(result_user['nickname']),
+                           openid=result_user['openid'],
+                           headimgurl=u'{0:s}'.format(result_user['headimgurl']),
+                           subscribe_time=u'{0:s}'.format(
+                               datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
+                               .strftime('%Y-%m-%d %H:%M:%S')))
+        return jsonify(wechat_user)
+    except WeiXinClientException, e:
+        return jsonify({u'errocde': e.errcode, u'errmsg': e.errmsg})
+
 
 @main.route('/weixinClient/api/v1.0/tasks', methods=['GET'])
 def get_tasks():
@@ -451,6 +493,20 @@ def get_tasks():
 # def example():
 #     resp = u'this is example'
 #     return resp
+
+# def jsonp(func):
+#     """Wraps JSONified output for JSONP requests."""
+#     @wraps(func)
+#     def decorated_function(*args, **kwargs):
+#         callback = request.args.get('callback', False)
+#         if callback:
+#             data = str(func(*args, **kwargs).data)
+#             content = str(callback) + '(' + data + ')'
+#             mimetype = 'application/javascript'
+#             return current_app.response_class(content, mimetype=mimetype)
+#         else:
+#             return func(*args, **kwargs)
+#     return decorated_function
 
 
 """
