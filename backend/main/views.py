@@ -30,8 +30,11 @@ tasks = [
     }
 ]
 
+
 def support_jsonp(f):
     """Wraps JSONified output for JSONP"""
+    # https://gist.github.com/aisipos/1094140
+    # http://flask.pocoo.org/snippets/79/
     @wraps(f)
     def decorated_function(*args, **kwargs):
         callback = request.args.get('callback', False)
@@ -165,11 +168,13 @@ def page_user():
 
             user = dict(nickname=result_user['nickname'],
                         openid=result_user['openid'],
+                        unionid=result_user['unionid'],
                         groupid=result_group['groupid'])
 
-            print(u'%s|%s|%s|%s' % (i,
+            print(u'%s|%s|%s|%s|%s' % (i,
                                     user['nickname'],
                                     user['openid'],
+                                    user['unionid'],
                                     user['groupid']))
 
             users.append(user)
