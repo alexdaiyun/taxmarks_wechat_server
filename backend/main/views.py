@@ -435,13 +435,17 @@ def query_member():
         wechat_user = dict(subscribe=result_user['subscribe'],
                            nickname=u'{0:s}'.format(result_user['nickname']),
                            openid=result_user['openid'],
+                           unionid=result_user['unionid'],
                            headimgurl=u'{0:s}'.format(result_user['headimgurl']),
                            subscribe_time=u'{0:s}'.format(
                                datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
-                               .strftime('%Y-%m-%d %H:%M:%S')))
+                               .strftime('%Y-%m-%d %H:%M'
+                               ':%S')))
         return jsonify(wechat_user)
     except WeiXinClientException, e:
         return jsonify({u'errocde': e.errcode, u'errmsg': e.errmsg}), 400
+
+
 
 
 # 暂不使用

@@ -8,11 +8,12 @@
 
             <h1>Help</h1>
             <h2>API接口列表</h2>
+            <h6>http://taxmarksmp.duapp.com/weixinClient/api/v1.0/</h6>
 
             <br>
             <h4>发送文本消息</h4>
             <ul>
-               <li>POST   &nbsp;&nbsp; <a href="#">/weixinClient/api/v1.0/sendTextMessage</a></li>
+               <li>POST   &nbsp;&nbsp; <a href="#">sendTextMessage</a></li>
             </ul>
             <pre>
                 请求参数：
@@ -55,6 +56,36 @@
                 <li>Get   &nbsp;&nbsp; <a href="/weixinClient/api/v1.0/tasks" target="_blank">/weixinClient/api/v1.0/tasks</a> </li>
             </ul>
             -->
+
+            <h4>获取用户信息</h4>
+            <ul>
+               <li>GET   &nbsp;&nbsp; <a href="#">Member</a></li>
+            </ul>
+            <pre>
+                请求参数：
+                 "openid": "oNGinuMVf5HsHloMbYvPGlN3VzvM"
+
+                openid: 接收方的openid
+            </pre>
+            <pre>
+                header设置：
+
+                Content-Type: application/json;charset=utf-8
+
+            </pre>
+            <pre>
+                返回结果
+                {
+                  "headimgurl": "http://wx.qlogo.cn/mmopen/K6tTGgHUTIEYzY9Mia24GvUdU8wELf0K1e5d1MX7Sje04qib5QgekygX2jbqlJUkuNJjCBQGAjFB7ibt2Cen3nibuibcpooK02e38/0",
+                  "nickname": "Liyaz",
+                  "openid": "o9PwGj__ZcLm82ncxrrdTmd0LA8U",
+                  "subscribe": 1,
+                  "subscribe_time": "2014-12-09 23:29:27",
+                  "unionid": "oFcUCsyrG8j74uu0V-leSgkutv0A"
+                }
+
+            </pre>
+
         </div>
 
 
