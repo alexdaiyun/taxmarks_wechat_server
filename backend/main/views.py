@@ -1,19 +1,16 @@
 # -*- coding:utf-8 -*-
 __author__ = 'alexday'
 
-import os
-import sys
 import datetime
-from urllib import quote, urlencode
 from functools import wraps
-from flask import current_app, render_template, jsonify, request, abort, make_response, redirect, json, url_for
+
+from flask import current_app, render_template, jsonify, request, abort, redirect
 
 from weixinApi.client import *
 from weixinApi.oauth import *
 from weixinApi.exceptions import WeiXinClientException
 from config import Config
 from . import main
-
 
 tasks = [
     {
@@ -43,7 +40,9 @@ def support_jsonp(f):
             return current_app.response_class(content, mimetype='application/javascript')
         else:
             return f(*args, **kwargs)
+
     return decorated_function
+
 
 @main.route('/')
 def home():
@@ -172,10 +171,10 @@ def page_user():
                         groupid=result_group['groupid'])
 
             print(u'%s|%s|%s|%s|%s' % (i,
-                                    user['nickname'],
-                                    user['openid'],
-                                    user['unionid'],
-                                    user['groupid']))
+                                       user['nickname'],
+                                       user['openid'],
+                                       user['unionid'],
+                                       user['groupid']))
 
             users.append(user)
             i += 1
@@ -264,7 +263,7 @@ def wx_auth():
 
     redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
 
-    current_app.logger.debug(u'redirect_url: %s' % redirect_url )
+    current_app.logger.debug(u'redirect_url: %s' % redirect_url)
 
     weixin_oauth = WeiXinOAuth(Config.MP_CONFIG['MP_AppID'],
                                Config.MP_CONFIG['MP_AppSecret'],
@@ -287,16 +286,18 @@ def wx_auth():
                                openid=result_user['openid'],
                                headimgurl=u'{0:s}'.format(result_user['headimgurl']),
                                subscribe_time=u'{0:s}'.format(
-                                   datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
-                                   .strftime('%Y-%m-%d %H:%M:%S')))
+                                   datetime.datetime.fromtimestamp(
+                                       int(result_user['subscribe_time']))
+                                       .strftime('%Y-%m-%d %H:%M:%S'))
+                               )
 
             current_app.logger.info(
                 u'subscribe:{0:d} | subscribe_time:{1:s}  | openid:{2:s} | nickname:{3:s} | headimgurl:{4:s} '
-                .format(wechat_user['subscribe'],
-                        wechat_user['subscribe_time'],
-                        wechat_user['openid'],
-                        wechat_user['nickname'],
-                        wechat_user['headimgurl']))
+                    .format(wechat_user['subscribe'],
+                            wechat_user['subscribe_time'],
+                            wechat_user['openid'],
+                            wechat_user['nickname'],
+                            wechat_user['headimgurl']))
 
             # 默认跳转处理
             sso_redirect_url_list = [
@@ -378,11 +379,11 @@ def create_send_text_message():
         result = client.message.send_text(touser, content)
     else:
         articles = [{
-                        'title': title,
-                        'description': content,
-                        'url': url,
-                        'image': ''
-                    }]
+            'title': title,
+            'description': content,
+            'url': url,
+            'image': ''
+        }]
         result = client.message.send_articles(touser, articles)
 
     return jsonify({'status': True, 'result': result})
@@ -426,26 +427,39 @@ def query_member():
     openid = request.args.get('openid', '')
 
     if openid == u"":
-        return jsonify({})
+        abort(400)
+        # return jsonify({}), 400
 
     try:
         client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
         result_user = client.user.get(openid)
 
+        # 获得的用户信息数据，有可能用户已取消关注，仅返回openid,unionid
         wechat_user = dict(subscribe=result_user['subscribe'],
-                           nickname=u'{0:s}'.format(result_user['nickname']),
+                           nickname=None
+                           if u'nickname' not in result_user
+                           else u'{0:s}'.format(result_user['nickname']),
+                           # nickname=u'{0:s}'.format(result_user['nickname']),
                            openid=result_user['openid'],
                            unionid=result_user['unionid'],
-                           headimgurl=u'{0:s}'.format(result_user['headimgurl']),
-                           subscribe_time=u'{0:s}'.format(
-                               datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
-                               .strftime('%Y-%m-%d %H:%M'
-                               ':%S')))
+                           headimgurl=None
+                           if u'headimgurl' not in result_user
+                           else u'{0:s}'.format(result_user['headimgurl']),
+                           subscribe_time=None
+                           if u'subscribe_time' not in result_user
+                           else u'{0:s}'.format(
+                               datetime.datetime.fromtimestamp(
+                                   int(result_user['subscribe_time'])).strftime('%Y-%m-%d %H:%M:%S'))
+                           )
+
+        # w_1 = {
+        #     u'nickname': None if u'nickname' not in result_user else u'{0:s}'.format(result_user['nickname']),
+        #     u'test': '1'
+        # }
+
         return jsonify(wechat_user)
     except WeiXinClientException, e:
         return jsonify({u'errocde': e.errcode, u'errmsg': e.errmsg}), 400
-
-
 
 
 # 暂不使用
@@ -465,7 +479,7 @@ def query_member_from_weixin(openid):
                            headimgurl=u'{0:s}'.format(result_user['headimgurl']),
                            subscribe_time=u'{0:s}'.format(
                                datetime.datetime.fromtimestamp(int(result_user['subscribe_time']))
-                               .strftime('%Y-%m-%d %H:%M:%S')))
+                                   .strftime('%Y-%m-%d %H:%M:%S')))
         return jsonify(wechat_user)
     except WeiXinClientException, e:
         return jsonify({u'errocde': e.errcode, u'errmsg': e.errmsg})
