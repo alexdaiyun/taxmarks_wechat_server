@@ -195,10 +195,12 @@ def wx_authorization():
     return render_template('wx_auth/wx_auth.html')
 
 
-# 预处理对用户执行微信oauth授权的引导
+# 预处理对用户执行微信oauth授权的引导，生成换取code的微信授权引导页
 @main.route('/wx_auth_redirect')
 def wx_auth_redirect():
-    # 生成换取code的微信授权引导页
+    args = request.args
+    menucode = args.get('menucode', '')
+    url = args.get('url', '')
 
     # url = u'https://open.weixin.qq.com/connect/oauth2/authorize?' \
     # u'appid=wx3ef755a9cf4666ef' \
@@ -207,13 +209,10 @@ def wx_auth_redirect():
     # u'&scope=snsapi_base' \
     # u'&state=STATE#wechat_redirect'
 
-    args = request.args
-    menucode = args.get('menucode', '')
-    url = args.get('url', '')
-
     if menucode == '':
         redirect_url = Config.APP_CONFIG['MP_SERVER_HOST'] + u'/wx_auth'
     else:
+        # url字符串转义处理
         url = six.moves.urllib.parse.quote_plus(url)
         redirect_url = Config.APP_CONFIG['MP_SERVER_HOST'] + u'/wx_auth?menucode=%s&url=%s' % (menucode, url)
 
@@ -221,50 +220,45 @@ def wx_auth_redirect():
 
     current_app.logger.debug(u'redirect_url: %s' % redirect_url)
 
+    # 创建WeiXinOAuth对象
     weixin_oauth = WeiXinOAuth(Config.MP_CONFIG['MP_AppID'],
                                Config.MP_CONFIG['MP_AppSecret'],
                                redirect_url,
                                'snsapi_base',
                                'STATE')
+    # 生成微信网页授权链接
     weixinoauth_url = weixin_oauth.authorize_url
 
     return redirect(weixinoauth_url, code=302)
 
 
+# 执行微信oauth授权
 @main.route('/wx_auth')
-def wx_auth():
-    # 通过code换取微信的网页授权access_token
-    # 使用snsapi_base方式时，也获得了openid
-
-    # resp = createOauthUrlForCode('http://helixappserver3.duapp.com/wx_auth')
+def wx_auth2():
     resp = None
     openid = None
     access_token = None
     access_token_res = None
+    sso_redirect_url_list = None
 
     args = request.args
+
+    # 获得微信提供的code值
     code = args.get('code', '')
-
+    # menucode 约定的菜单代码
     menucode = args.get('menucode', '')
+    # url 重定向的链接地址
     url = args.get('url', '')
-    current_app.logger.debug(u'[/wx_auth] menucode: %s  url: %s ' % (menucode, url))
-    # 跳转页面默认值
-    redirect_url = u''
-    # 跳转页面根据menucode值进行设定
-    if menucode == '201':
-        redirect_url = Config.APP_CONFIG['WE_CENTER_HOST'] + u'/wecenter/'
-    if menucode == '202':
-        # 跳转到weCenter发布页面上
-        redirect_url = Config.APP_CONFIG['WE_CENTER_HOST'] + u'/wecenter/?/m/publish/'
-    if menucode == '100':
-        redirect_url = url
-    if menucode == '101':
-        redirect_url = url
 
-    redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
+    current_app.logger.debug(u'[/wx_auth] menucode: %s  url: %s ' % (menucode, url))
+
+    # 根据menucode 重定向页面地址
+    redirect_url = u''
+
 
     current_app.logger.debug(u'redirect_url: %s' % redirect_url)
 
+    # 创建WeiXinOAuth对象
     weixin_oauth = WeiXinOAuth(Config.MP_CONFIG['MP_AppID'],
                                Config.MP_CONFIG['MP_AppSecret'],
                                '',
@@ -272,18 +266,22 @@ def wx_auth():
                                'STATE')
 
     if code:
-        # 用微信的code换取access_token, openid
+        # 用微信的code换取access_token, openid, unionid
         try:
+            # 微信 OAuth2 access token
             access_token_res = weixin_oauth.fetch_access_token(code)
             openid = access_token_res['openid']
             access_token = access_token_res['access_token']
 
-            client = WeiXinClient(Config.MP_CONFIG['MP_AppID'], Config.MP_CONFIG['MP_AppSecret'])
+            # 创建WeiXinClient对象
+            client = WeiXinClient(Config.MP_CONFIG['MP_AppID'],
+                                  Config.MP_CONFIG['MP_AppSecret'])
+            # 获得微信用户信息
             result_user = client.user.get(openid)
-
             wechat_user = dict(subscribe=result_user['subscribe'],
                                nickname=u'{0:s}'.format(result_user['nickname']),
                                openid=result_user['openid'],
+                               unionid=result_user['unionid'],
                                headimgurl=u'{0:s}'.format(result_user['headimgurl']),
                                subscribe_time=u'{0:s}'.format(
                                    datetime.datetime.fromtimestamp(
@@ -292,35 +290,45 @@ def wx_auth():
                                )
 
             current_app.logger.info(
-                u'subscribe:{0:d} | subscribe_time:{1:s}  | openid:{2:s} | nickname:{3:s} | headimgurl:{4:s} '
+                u'subscribe:{0:d} | subscribe_time:{1:s}  | openid:{2:s} | unionid:{3:s} | nickname:{4:s} \
+                | headimgurl:{5:s} '
                     .format(wechat_user['subscribe'],
                             wechat_user['subscribe_time'],
                             wechat_user['openid'],
+                            wechat_user['unionid'],
                             wechat_user['nickname'],
                             wechat_user['headimgurl']))
 
-            # 默认跳转处理
+            # 页面重定向处理 Start
+
+            # 跳转页面根据menucode值进行设定
+            if menucode == '100':
+                redirect_url = url
+            if menucode == '101':
+                redirect_url = url
+            if menucode == '201':
+                # 跳转到问答(weCenter)页面上
+                redirect_url = Config.APP_CONFIG['WE_CENTER_HOST'] + u'/?/m/'
+            if menucode == '202':
+                # 跳转到问答(weCenter)发布页面上
+                redirect_url = Config.APP_CONFIG['WE_CENTER_HOST'] + u'/?/m/publish/'
+            # url字符串转义处理
+            redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
+
+            # 页面重定向的默认值：通过SSO服务器的SsoRedirect页面重定向
             sso_redirect_url_list = [
                 Config.APP_CONFIG['SSO_SERVER_HOST'],
                 u'/SsoRedirect.aspx?',
                 u'openid=',
                 openid,
                 u'&',
+                u'unionid=',
+                wechat_user['unionid'],
+                u'&',
                 u'url=',
                 redirect_url
             ]
 
-            if menucode == '200':
-                # 进入绑定页面
-                sso_redirect_url_list = [
-                    Config.APP_CONFIG['TAXMARKS_WEIXINWEB_HOST'],
-                    u'/#/wx_bind?',
-                    u'openid=',
-                    openid,
-                    u'&',
-                    u'url=',
-                    redirect_url
-                ]
             if menucode == '100':
                 # 税签微信版的SSO验证页面
                 sso_redirect_url_list = [
@@ -334,7 +342,7 @@ def wx_auth():
                 ]
 
             if menucode == '101':
-                # 税签微信版的SSO验证页面
+                # 税签微信版的SSO绑定页面
                 sso_redirect_url_list = [
                     Config.APP_CONFIG['TAXMARKS_WEIXINWEB_HOST'],
                     u'/#/wx_bind?',
@@ -347,6 +355,9 @@ def wx_auth():
 
             current_app.logger.debug(''.join(sso_redirect_url_list))
 
+            # 页面重定向处理 End
+
+            # 获得新的链接地址，开始进行重定向跳转
             return redirect(''.join(sso_redirect_url_list), code=302)
 
         except WeiXinOAuthException, e:
@@ -555,6 +566,9 @@ def get_tasks():
   100  税签微信版的SSO验证页面
   101  税签微信版的绑定微信页面
   102  税签微信版的注册用户页面（同时绑定微信）
+
+  注： 当menucode为1xx时，url值必须是税签微信版中的路径地址
+
 
 
 /wx/authorization 微信绑定验证 (暂不使用）

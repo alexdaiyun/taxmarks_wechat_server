@@ -34,6 +34,11 @@ def weixin():
     current_app.logger.debug('[/weixin] signature:%s  timestamp:%s  nonce:%s  echostr:%s ' %
                              (signature, timestamp, nonce, echo_str))
 
+    # mp_id = u'mp_01'
+    #
+    # t_1 = Config.MP_Multi_CONFIG['mp_01']
+    # t_2 = Config.MP_Multi_CONFIG[mp_id]['MP_TOKEN_KEY']
+
     try:
         check_signature(Config.MP_CONFIG['MP_TOKEN_KEY'], signature, timestamp, nonce)
     except InvalidSignatureException:

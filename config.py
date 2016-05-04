@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 __author__ = 'alexday'
 
-import os
 import logging
-from hashlib import md5
+
+import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,10 +17,17 @@ APP_CONFIG = {
     'WE_CENTER_HOST': u'http://218.244.132.167:8080'  # WeCenter的主机地址
 }
 
-MP_CCONFIG = {
+
+# 微信号 taxmarks
+# 类型   服务号
+# 原始ID gh_ad4b0ddb7ac4
+MP_CONFIG = {
+    'MP_Number': u'gh_ad4b0ddb7ac4',
+    'MP_Name': u'taxmarks',
     'MP_TOKEN_KEY': u'rismotax1234',
     'MP_AppID': u'wx37d853e02c8a692c',
-    'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb'
+    'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
+    'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
 }
 
 BAE_ApiKey = 'ZwzUxUgBv7p27a55lf50K11F'
@@ -63,7 +70,7 @@ class Config:
         'MP_SERVER_HOST': u'http://taxmarksmp.duapp.com',  # MP_SERVER的主机地址
         'SSO_SERVER_HOST': u'http://www.taxmarks.com:8100',  # 提供SSO服务的地址
         'TAXMARKS_WEIXINWEB_HOST': u'http://www.taxmarks.com/taxmarkswxweb',  # taxmarks weixinweb的主机地址
-        'WE_CENTER_HOST': u'http://218.244.132.167:8080'  # WeCenter的主机地址
+        'WE_CENTER_HOST': u'http://www.taxmarks.com/wenda'  # 问答社区(weCenter)的主机地址
     }
 
     # MP - weChat
@@ -74,6 +81,24 @@ class Config:
         'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
         'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
     }
+
+    MP_Multi_CONFIG = {
+        'mp_01': {
+            'MP_TOKEN_KEY': u'rismotax1234',
+            'MP_AppID': u'wx37d853e02c8a692c',
+            'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
+            'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
+        },
+        'mp_02': {
+            'MP_TOKEN_KEY': u'rismotax1234',
+            'MP_AppID': u'wx37d853e02c8a692c',
+            'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
+            'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
+        }
+    }
+
+
+
 
     @staticmethod
     def get_mailhandler():
