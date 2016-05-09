@@ -185,6 +185,7 @@ def page_user():
     return render_template('user/user.html', users=users)
 
 
+# 此功能停用
 @main.route('/wx/authorization')
 def wx_authorization():
     args = request.args
@@ -209,11 +210,12 @@ def wx_auth_redirect():
     # u'&scope=snsapi_base' \
     # u'&state=STATE#wechat_redirect'
 
+    # url字符串转义处理
+    url = six.moves.urllib.parse.quote_plus(url)
     if menucode == '':
-        redirect_url = Config.APP_CONFIG['MP_SERVER_HOST'] + u'/wx_auth'
+        redirect_url = Config.APP_CONFIG['MP_SERVER_HOST'] + u'/wx_auth?url=%s' % (url)
     else:
-        # url字符串转义处理
-        url = six.moves.urllib.parse.quote_plus(url)
+
         redirect_url = Config.APP_CONFIG['MP_SERVER_HOST'] + u'/wx_auth?menucode=%s&url=%s' % (menucode, url)
 
     # redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
@@ -234,7 +236,7 @@ def wx_auth_redirect():
 
 # 执行微信oauth授权
 @main.route('/wx_auth')
-def wx_auth2():
+def wx_auth():
     resp = None
     openid = None
     access_token = None
@@ -252,8 +254,9 @@ def wx_auth2():
 
     current_app.logger.debug(u'[/wx_auth] menucode: %s  url: %s ' % (menucode, url))
 
-    # 根据menucode 重定向页面地址
-    redirect_url = u''
+    # 重定向页面地址从参数url中获得
+    #redirect_url = u''
+    redirect_url = url
 
 
     current_app.logger.debug(u'redirect_url: %s' % redirect_url)
@@ -312,6 +315,7 @@ def wx_auth2():
             if menucode == '202':
                 # 跳转到问答(weCenter)发布页面上
                 redirect_url = Config.APP_CONFIG['WE_CENTER_HOST'] + u'/?/m/publish/'
+
             # url字符串转义处理
             redirect_url = six.moves.urllib.parse.quote_plus(redirect_url)
 
@@ -326,6 +330,8 @@ def wx_auth2():
                 wechat_user['unionid'],
                 u'&',
                 u'url=',
+                u'&',
+                u'redirect_to=',
                 redirect_url
             ]
 
@@ -337,7 +343,12 @@ def wx_auth2():
                     u'openid=',
                     openid,
                     u'&',
+                    u'unionid=',
+                    wechat_user['unionid'],
+                    u'&',
                     u'url=',
+                    u'&',
+                    u'redirect_to=',
                     redirect_url
                 ]
 
@@ -348,6 +359,9 @@ def wx_auth2():
                     u'/#/wx_bind?',
                     u'openid=',
                     openid,
+                    u'&',
+                    u'unionid=',
+                    wechat_user['unionid'],
                     u'&',
                     u'url=',
                     redirect_url

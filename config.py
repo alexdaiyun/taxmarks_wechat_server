@@ -82,20 +82,20 @@ class Config:
         'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
     }
 
-    MP_Multi_CONFIG = {
-        'mp_01': {
-            'MP_TOKEN_KEY': u'rismotax1234',
-            'MP_AppID': u'wx37d853e02c8a692c',
-            'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
-            'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
-        },
-        'mp_02': {
-            'MP_TOKEN_KEY': u'rismotax1234',
-            'MP_AppID': u'wx37d853e02c8a692c',
-            'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
-            'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
-        }
-    }
+    # MP_Multi_CONFIG = {
+    #     'mp_01': {
+    #         'MP_TOKEN_KEY': u'rismotax1234',
+    #         'MP_AppID': u'wx37d853e02c8a692c',
+    #         'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
+    #         'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
+    #     },
+    #     'mp_02': {
+    #         'MP_TOKEN_KEY': u'rismotax1234',
+    #         'MP_AppID': u'wx37d853e02c8a692c',
+    #         'MP_AppSecret': u'5b20fcb9c6b42b76a5c44b093ed46ecb',
+    #         'MP_EncodingAESKey': u'eh5b0jzLwbgGWFAFClkw91sctar3Sdk4Ush5bbcr8t9'
+    #     }
+    # }
 
 
 
